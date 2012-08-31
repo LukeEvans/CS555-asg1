@@ -44,7 +44,6 @@ public class PeerList {
 
 			//Read File Line By Line
 			while ((strLine = br.readLine()) != null)   {
-				System.out.println (strLine);
 				createPeerFromLine(strLine);
 			}
 			//Close the input stream

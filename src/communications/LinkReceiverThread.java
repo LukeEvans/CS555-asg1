@@ -1,6 +1,5 @@
 package communications;
 
-import java.awt.Container;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.Socket;
