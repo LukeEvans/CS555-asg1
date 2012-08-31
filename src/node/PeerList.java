@@ -36,7 +36,7 @@ public class PeerList {
 	public void buildList(){
 		try{
 			// Open the file that is the first 
-			FileInputStream fstream = new FileInputStream("textfile.txt");
+			FileInputStream fstream = new FileInputStream(filename);
 			DataInputStream in = new DataInputStream(fstream);
 			BufferedReader br = new BufferedReader(new InputStreamReader(in));
 

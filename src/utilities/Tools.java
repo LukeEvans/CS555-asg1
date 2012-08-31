@@ -1,5 +1,9 @@
 package utilities;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.Socket;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 
@@ -34,6 +38,37 @@ public class Tools {
 		return random;
 	}
 
+	
+	//================================================================================
+	// Link Functions 
+	//================================================================================
+	// Create input stream
+	public static InputStream createInput(Socket s){
+		InputStream sin;
+		
+		try {
+			sin = s.getInputStream();
+			return sin;
+		} catch (IOException e){
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	// Create output stream
+	public static OutputStream createOutputStream(Socket s){
+		OutputStream sout;
+		
+		try {
+			sout = s.getOutputStream();
+			return sout;
+		} catch (IOException e){
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	
 	// ================================================================================
 	// Host Functions
 	// ================================================================================
@@ -48,4 +83,17 @@ public class Tools {
 		}
 	}
 
+	//================================================================================
+	// Byte Manipulations
+	//================================================================================
+	// convert string to byte array
+	public static byte[] convertToBytes(String s){
+		return s.getBytes();
+	}
+	
+	// Convert Int to byte array
+	public static byte[] convertToBytes(int i){
+		return convertToBytes(Integer.toString(i));
+	}
+	
 }
