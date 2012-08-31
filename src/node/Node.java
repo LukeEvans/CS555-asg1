@@ -66,7 +66,7 @@ public class Node {
 		}
 
 		// Close link
-		link.close();
+		//link.close();
 	}
 	
 	
@@ -200,9 +200,9 @@ public class Node {
 			node.beginRound();
 		}
 				
+		Tools.sleep(10000);
+		
 		// Show output
 		node.printOutput();
-		
-		
 	}
 }

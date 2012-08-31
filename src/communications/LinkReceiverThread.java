@@ -55,6 +55,6 @@ public class LinkReceiverThread extends Thread{
 		}
 				
 		// Close link
-		//link.close();
+		link.close();
 	}
 }
