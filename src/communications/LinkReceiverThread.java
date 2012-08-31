@@ -53,8 +53,8 @@ public class LinkReceiverThread extends Thread{
 				e.printStackTrace();
 			}
 		}
-		
+				
 		// Close link
-		link.close();
+		//link.close();
 	}
 }

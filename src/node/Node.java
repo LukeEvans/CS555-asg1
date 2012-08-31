@@ -58,13 +58,15 @@ public class Node {
 		// Abstract the link from the peer
 		Link link = connect(peer);
 		if (link == null) return;
-		
+				
 		for (int i=0; i<messagePerRound; i++){
 			// Send data
 			int randomNumber = Tools.generateRandomNumber();
 			sendPayload(link, randomNumber);
 		}
 
+		// Close link
+		link.close();
 	}
 	
 	
@@ -191,14 +193,16 @@ public class Node {
 		node.initServer();
 		
 		// Sleep to give time for others to join
-		Tools.sleep(1000);
+		Tools.sleep(10000);
 		
 		// For each round begin round
 		for (int i=0; i<numberOfRounds; i++){
 			node.beginRound();
 		}
-		
+				
 		// Show output
 		node.printOutput();
+		
+		
 	}
 }

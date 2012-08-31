@@ -23,6 +23,7 @@ public class Link {
 		socket = s;
 		node = n;
 		remoteHost = socket.getInetAddress().getHostName();
+		receiver = new LinkReceiverThread(socket, this);
 	}
 	
 	public void initLink(){
@@ -61,7 +62,7 @@ public class Link {
 		try {
 			socket.close();
 		} catch (IOException e){
-			e.printStackTrace();
+			System.out.println("Could not close socket");
 		}
 	}
 }

@@ -115,6 +115,10 @@ public class PeerList {
 	//================================================================================
 	// Get next peer
 	public Peer getNextPeer(){
+		if (listOfPeers.size() == 0){
+			return null;
+		}
+		
 		int peerIndex = Math.abs(Tools.generateRandomNumber()) % listOfPeers.size();
 		return listOfPeers.get(peerIndex);
 	}
