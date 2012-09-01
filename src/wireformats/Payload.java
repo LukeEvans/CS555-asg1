@@ -54,6 +54,12 @@ public class Payload {
 		number = bbuff.getInt();
 	}
 
+
+	
+	//================================================================================
+	// House Keeping
+	//================================================================================
+	
 	// To String
 	public String toString() {
 		String s = "";
@@ -62,5 +68,10 @@ public class Payload {
 		s += "Number       : " + number + "\n";
 
 		return s;
+	}
+	
+	// Override .equals
+	public boolean equals(Payload other){
+		return this.number == other.number;
 	}
 }

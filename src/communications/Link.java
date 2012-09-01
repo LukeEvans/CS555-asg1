@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
 
+import javax.net.ssl.HostnameVerifier;
+
 import utilities.Tools;
 
 import node.Node;
@@ -35,13 +37,15 @@ public class Link {
 	// Send 
 	//================================================================================
 	public void sendData(byte[] dataToBeSent){
-		OutputStream  sout = Tools.createOutputStream(socket);
-		
-		try {
-			sout.write(dataToBeSent);
-		} catch (IOException e){
-			e.printStackTrace();
-		}
+//		OutputStream  sout = Tools.createOutputStream(socket);
+//		
+//		try {
+//			sout.write(dataToBeSent);
+//		} catch (IOException e){
+//			e.printStackTrace();
+//		}
+		LinkSendingThread sender = new LinkSendingThread(socket, dataToBeSent);
+		sender.start();
 	}
 	
 	
