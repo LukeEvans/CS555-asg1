@@ -1,12 +1,14 @@
 package communications;
 
 import java.io.IOException;
-import java.io.OutputStream;
+import java.io.InputStream;
 import java.net.Socket;
 
-import javax.net.ssl.HostnameVerifier;
-
 import utilities.Tools;
+import wireformats.Constants;
+import wireformats.Payload;
+import wireformats.Verification;
+
 
 import node.Node;
 
@@ -17,7 +19,7 @@ public class Link {
 	Socket socket;
 	Node node;
 	LinkReceiverThread receiver;
-	
+
 	//================================================================================
 	// Constructor
 	//================================================================================
@@ -27,42 +29,36 @@ public class Link {
 		remoteHost = socket.getInetAddress().getHostName();
 		receiver = new LinkReceiverThread(socket, this);
 	}
-	
+
 	public void initLink(){
+		System.out.println("Init link");
 		receiver.start();
 	}
-	
-	
+
+
 	//================================================================================
 	// Send 
 	//================================================================================
 	public void sendData(byte[] dataToBeSent){
-//		OutputStream  sout = Tools.createOutputStream(socket);
-//		
-//		try {
-//			sout.write(dataToBeSent);
-//		} catch (IOException e){
-//			e.printStackTrace();
-//		}
 		LinkSendingThread sender = new LinkSendingThread(socket, dataToBeSent);
 		sender.start();
 	}
-	
-	
+
+
 	//================================================================================
 	// Receive
 	//================================================================================
 	public void dataReceived(int bytes, byte[] dataReceived){
 		node.receive(dataReceived,this);
 	}
-	
-	
+
+
 	//================================================================================
 	// House Keeping
 	//================================================================================
 	public void close() {
 		receiver.cont = false;
-		
+
 		try {
 			socket.close();
 		} catch (IOException e){

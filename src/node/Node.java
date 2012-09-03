@@ -71,8 +71,10 @@ public class Node {
 
 		for (int i=0; i<messagePerRound; i++){
 			// Send data
+			Tools.sleep(1);
 			int randomNumber = Tools.generateRandomNumber();
 			sendPayload(link, randomNumber);
+			
 		}
 
 	}
@@ -133,8 +135,8 @@ public class Node {
 			trackReceive(payload.number);
 
 			// Send verification
-			//Verification ack = new Verification(payload.number);
-			//l.sendData(ack.marshall());
+//			Verification ack = new Verification(payload.number);
+//			l.sendData(ack.marshall());
 
 			break;
 
@@ -143,7 +145,7 @@ public class Node {
 			Verification verification = new Verification();
 			verification.unmarshall(bytes);
 
-//			System.out.println("Received verification");
+			System.out.println("Received verification");
 //			System.out.println(verification);
 
 			break;
@@ -213,6 +215,8 @@ public class Node {
 		Node node = new  Node(peerList, port, messagesPerRound);
 		node.initServer();
 
+		System.out.println("Waiting for other nodes to join the system...");
+		
 		// Sleep to give time for others to join
 		Tools.sleep(10);
 		

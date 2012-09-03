@@ -49,6 +49,7 @@ public class LinkReceiverThread extends Thread{
 				
 				// Pass data back to Link
 				link.dataReceived(numRead,bytesnum);
+				
 			} catch (IOException e){
 				e.printStackTrace();
 			}
