@@ -28,7 +28,7 @@ public class LinkSendingThread extends Thread{
 		
 		try {
 			sout.write(data);
-			System.out.println("Sent");
+			//System.out.println("Sent");
 		} catch (IOException e){
 			e.printStackTrace();
 		}

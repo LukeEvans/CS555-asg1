@@ -31,7 +31,7 @@ public class Link {
 	}
 
 	public void initLink(){
-		System.out.println("Init link");
+		//System.out.println("Init link");
 		receiver.start();
 	}
 
@@ -53,6 +53,38 @@ public class Link {
 	}
 
 
+	public int waitForData(){
+		InputStream sin = Tools.createInput(socket);
+		byte[] bytesnum = new byte[Constants.LEN_BYTES];
+		int numRead;
+		
+		try {
+			numRead = sin.read(bytesnum);
+			
+			if (numRead >= 0){
+				int messageType = Tools.getMessageType(bytesnum);
+				
+				switch (messageType) {
+				case Constants.Verification:
+					
+					Verification ack = new Verification();
+					ack.unmarshall(bytesnum);
+					
+					return ack.number;
+
+				default:
+					break;
+				}
+			}
+			
+			
+			
+		} catch (IOException e){
+			e.printStackTrace();
+		}
+		
+		return -1;
+	}
 	//================================================================================
 	// House Keeping
 	//================================================================================

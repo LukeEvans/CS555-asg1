@@ -42,7 +42,7 @@ public class ServerSockThread extends Thread{
 				Link link = new Link(socket, node);
 				link.initLink();
 				
-				System.out.println("Accepted");
+				//System.out.println("Accepted");
 				
 			} catch (IOException e){
 				e.printStackTrace();

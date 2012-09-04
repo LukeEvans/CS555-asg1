@@ -71,10 +71,12 @@ public class Node {
 
 		for (int i=0; i<messagePerRound; i++){
 			// Send data
-			Tools.sleep(1);
 			int randomNumber = Tools.generateRandomNumber();
 			sendPayload(link, randomNumber);
 			
+			if (link.waitForData() != randomNumber){
+				System.out.println("Verification did not match.");
+			}
 		}
 
 	}
@@ -88,8 +90,7 @@ public class Node {
 		try {
 			sock = new Socket(p.hostname,p.port);
 			link = new Link(sock, this);
-			link.initLink();
-		} catch (IOException e){
+			} catch (IOException e){
 			e.printStackTrace();
 		}
 
@@ -129,14 +130,14 @@ public class Node {
 			Payload payload = new Payload();
 			payload.unmarshall(bytes);
 
-			System.out.println("Received Payload");
+			//System.out.println("Received Payload");
 			//System.out.println(payload);
 
 			trackReceive(payload.number);
 
 			// Send verification
-//			Verification ack = new Verification(payload.number);
-//			l.sendData(ack.marshall());
+			Verification ack = new Verification(payload.number);
+			l.sendData(ack.marshall());
 
 			break;
 
