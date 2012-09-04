@@ -82,7 +82,7 @@ public class Link {
 					return ack.number;
 
 				case Constants.Payload:
-					System.out.println("Fuck");
+					System.out.println("Oh boy");
 					System.exit(1);
 					break;
 				default:

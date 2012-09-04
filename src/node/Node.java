@@ -188,7 +188,7 @@ public class Node {
 			TotalDifference total = new TotalDifference();
 			total.unmarshall(bytes);
 			
-			System.out.println(l.remoteHost + ", " + total.number);
+			//System.out.println(l.remoteHost + ", " + total.number);
 			
 			countTotal += total.number;
 			
@@ -294,6 +294,8 @@ public class Node {
 		// Sleep to give time for others to join
 		Tools.sleep(10);
 
+		System.out.println("Beginning " + numberOfRounds + " rounds...");
+		
 		// For each round begin round
 		for (int i=0; i<numberOfRounds; i++){
 			node.beginRound();
