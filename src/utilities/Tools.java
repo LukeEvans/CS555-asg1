@@ -3,6 +3,7 @@ package utilities;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.Inet4Address;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
@@ -38,14 +39,14 @@ public class Tools {
 		return random;
 	}
 
-	
+
 	//================================================================================
 	// Link Functions 
 	//================================================================================
 	// Create input stream
 	public static InputStream createInput(Socket s){
 		InputStream sin;
-		
+
 		try {
 			sin = s.getInputStream();
 			return sin;
@@ -54,11 +55,11 @@ public class Tools {
 			return null;
 		}
 	}
-	
+
 	// Create output stream
 	public static OutputStream createOutputStream(Socket s){
 		OutputStream sout;
-		
+
 		try {
 			sout = s.getOutputStream();
 			return sout;
@@ -67,20 +68,30 @@ public class Tools {
 			return null;
 		}
 	}
-	
-	
+
+
 	// ================================================================================
 	// Host Functions
 	// ================================================================================
 	public static String getLocalHostname() {
-		try {
-			String localhostname = java.net.InetAddress.getLocalHost().getHostName();
-			return localhostname;
-		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
+		return getHostname("localhost");
+	}
+
+	public static String getHostname(String hname) {
+		if (hname.equalsIgnoreCase("localhost") || hname.equalsIgnoreCase("127.0.0.1")){
+
+			try {
+				String host = Inet4Address.getLocalHost().getHostName();
+				
+				return host;
+
+			} catch (UnknownHostException e) {
+				e.printStackTrace();
+				System.exit(1);
+			}
 		}
+
+		return hname;
 	}
 
 	public static void sleep(int time){
@@ -98,10 +109,10 @@ public class Tools {
 	public static byte[] convertToBytes(String s){
 		return s.getBytes();
 	}
-	
+
 	// Convert Int to byte array
 	public static byte[] convertToBytes(int i){
 		return convertToBytes(Integer.toString(i));
 	}
-	
+
 }

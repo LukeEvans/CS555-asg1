@@ -24,11 +24,10 @@ public class LinkSendingThread extends Thread{
 	// Run
 	//================================================================================
 	public void run(){
-		OutputStream  sout = Tools.createOutputStream(socket);
+		OutputStream sout = Tools.createOutputStream(socket);
 		
 		try {
 			sout.write(data);
-			//System.out.println("Sent");
 		} catch (IOException e){
 			e.printStackTrace();
 		}

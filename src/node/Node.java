@@ -32,6 +32,9 @@ public class Node {
 	// Vector to hold
 	Vector<Payload> messageList;
 
+	Boolean sendLock;
+	Boolean recLock;
+
 	//================================================================================
 	// Constructor Process
 	//================================================================================
@@ -48,6 +51,9 @@ public class Node {
 		receiveSummation = 0;
 
 		messageList = new Vector<Payload>();
+
+		sendLock = new Boolean(true);
+		recLock = new Boolean(true);
 	}
 
 	public void initServer(){
@@ -65,19 +71,33 @@ public class Node {
 		Peer peer = peerList.getNextPeer();
 		if (peer == null) return;
 
+		
 		// Abstract the link from the peer
 		Link link = connect(peer);
 		if (link == null) return;
+
+		//System.out.println("Sending to: " + peer.hostname + " " + link.remoteHost);
 
 		for (int i=0; i<messagePerRound; i++){
 			// Send data
 			int randomNumber = Tools.generateRandomNumber();
 			sendPayload(link, randomNumber);
-			
-			if (link.waitForData() != randomNumber){
+
+			int reply = link.waitForData();
+
+			//System.out.println("Sent: " + randomNumber + " Received: " + reply);
+
+			if (reply != randomNumber){
 				System.out.println("Verification did not match.");
+				System.exit(1);
 			}
+
+			// We have heard back with the correct number
+			trackSend(randomNumber);
 		}
+
+		// Close link
+		link.close();
 
 	}
 
@@ -90,7 +110,7 @@ public class Node {
 		try {
 			sock = new Socket(p.hostname,p.port);
 			link = new Link(sock, this);
-			} catch (IOException e){
+		} catch (IOException e){
 			e.printStackTrace();
 		}
 
@@ -102,17 +122,19 @@ public class Node {
 	//================================================================================
 	// Send data
 	public void sendPayload(Link link, int number){
+
 		Payload payload = new Payload(number);
 		link.sendData(payload.marshall());
-		
+
 		// Increment data
-		trackSend(number);
+		//trackSend(number);
 	}
 
 	// Thread safe increment send tracker and summation
 	public synchronized void trackSend(int n){
 		sendTracker++;
 		sendSummation += n;
+
 	}
 
 
@@ -120,7 +142,7 @@ public class Node {
 	// Receive
 	//================================================================================
 	// Receieve data
-	public void receive(byte[] bytes, Link l){
+	public synchronized void receive(byte[] bytes, Link l){
 
 		int messageType = Tools.getMessageType(bytes);
 
@@ -147,7 +169,8 @@ public class Node {
 			verification.unmarshall(bytes);
 
 			System.out.println("Received verification");
-//			System.out.println(verification);
+			System.exit(1);
+			//			System.out.println(verification);
 
 			break;
 
@@ -160,8 +183,10 @@ public class Node {
 
 	// Thread safe increment receive tracker and summation
 	public synchronized void trackReceive(int n){
+
 		receiveTracker++;
 		receiveSummation += n;
+
 	}
 
 	//================================================================================
@@ -169,12 +194,16 @@ public class Node {
 	//================================================================================
 	// Print output
 	public void printOutput() {
-		
+
 		System.out.println("\nNumber Sent: " + sendTracker);
 		System.out.println("Number Received: " + receiveTracker);
 
+		System.out.println("Difference Number: " + (sendTracker - receiveTracker));
+		
 		System.out.println("\nSend sum: " + sendSummation);
 		System.out.println("Receive sum: " + receiveSummation);
+		
+		System.out.println("Difference Summation: " + (sendSummation - receiveSummation));
 
 	}
 
@@ -186,7 +215,7 @@ public class Node {
 	//================================================================================
 	//================================================================================
 	public static void main(String[] args){
-		
+
 		int numberOfRounds = 5000;
 		int messagesPerRound = 5;
 		int port = 0;
@@ -217,10 +246,10 @@ public class Node {
 		node.initServer();
 
 		System.out.println("Waiting for other nodes to join the system...");
-		
+
 		// Sleep to give time for others to join
 		Tools.sleep(10);
-		
+
 		// For each round begin round
 		for (int i=0; i<numberOfRounds; i++){
 			node.beginRound();

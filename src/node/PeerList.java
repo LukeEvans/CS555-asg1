@@ -58,7 +58,7 @@ public class PeerList {
 		String[] stringParts = line.split("\\s+");
 		
 		if (stringParts.length == 2){
-			String host = stringParts[0];
+			String host = Tools.getHostname(stringParts[0]);
 			int port = Integer.parseInt(stringParts[1]);
 			
 			// Add Peer
@@ -104,7 +104,11 @@ public class PeerList {
 	public void removeSelf(){
 		Peer self = findPeer(localHost, locaPort);
 
+		System.out.println("LocalHost: "+ localHost);
+		System.out.println("LocalPort: "+ locaPort);
+		
 		if (self != null){
+			System.out.println("Removing self");
 			removePeer(self);
 		}
 	}

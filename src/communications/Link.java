@@ -2,6 +2,7 @@ package communications;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.Socket;
 
 import utilities.Tools;
@@ -15,7 +16,7 @@ import node.Node;
 // Link is a class to abstract a connection between nodes
 public class Link {
 
-	String remoteHost;
+	public String remoteHost;
 	Socket socket;
 	Node node;
 	LinkReceiverThread receiver;
@@ -40,8 +41,16 @@ public class Link {
 	// Send 
 	//================================================================================
 	public void sendData(byte[] dataToBeSent){
-		LinkSendingThread sender = new LinkSendingThread(socket, dataToBeSent);
-		sender.start();
+//		LinkSendingThread sender = new LinkSendingThread(socket, dataToBeSent);
+//		sender.start();
+		
+		OutputStream sout = Tools.createOutputStream(socket);
+		
+		try {
+			sout.write(dataToBeSent);
+		} catch (IOException e){
+			e.printStackTrace();
+		}
 	}
 
 
@@ -72,6 +81,10 @@ public class Link {
 					
 					return ack.number;
 
+				case Constants.Payload:
+					System.out.println("Fuck");
+					System.exit(1);
+					break;
 				default:
 					break;
 				}
