@@ -7,6 +7,8 @@ import java.util.Vector;
 import utilities.Tools;
 import wireformats.Constants;
 import wireformats.Payload;
+import wireformats.SumDifference;
+import wireformats.TotalDifference;
 import wireformats.Verification;
 import communications.Link;
 import communications.ServerSockThread;
@@ -35,6 +37,11 @@ public class Node {
 	Boolean sendLock;
 	Boolean recLock;
 
+	// Used for the collection server
+	int countTotal;
+	int sumTotal;
+	int finishCount;
+	
 	//================================================================================
 	// Constructor Process
 	//================================================================================
@@ -54,6 +61,10 @@ public class Node {
 
 		sendLock = new Boolean(true);
 		recLock = new Boolean(true);
+		
+		countTotal = 0;
+		sumTotal = 0;
+		finishCount = 0;
 	}
 
 	public void initServer(){
@@ -170,10 +181,34 @@ public class Node {
 
 			System.out.println("Received verification");
 			System.exit(1);
-			//			System.out.println(verification);
 
 			break;
 
+		case Constants.Total_Difference:
+			TotalDifference total = new TotalDifference();
+			total.unmarshall(bytes);
+			
+			System.out.println(l.remoteHost + ", " + total.number);
+			
+			countTotal += total.number;
+			
+			break;
+			
+		case Constants.Sum_Difference:
+			SumDifference sum = new SumDifference();
+			sum.unmarshall(bytes);
+			
+			sumTotal += sum.number;
+			finishCount++;
+			
+			// If we've heard back from everybody, print
+			if (finishCount == peerList.size()){
+				System.out.println("\n\nFinished:");
+				System.out.println("Total Difference: " + countTotal);
+				System.out.println("Sum Difference:   " + sumTotal);
+			}
+			break;
+			
 		default:
 
 			System.out.println("Received unrecognized message");
@@ -205,6 +240,15 @@ public class Node {
 		
 		System.out.println("Difference Summation: " + (sendSummation - receiveSummation));
 
+		// Connect to the cumulation server to print totals
+		Peer collection = new Peer("bean", 5555);
+		Link link = connect(collection);
+		
+		TotalDifference total = new TotalDifference((sendTracker - receiveTracker));
+		link.sendData(total.marshall());
+		
+		SumDifference sumTotal = new SumDifference((sendSummation - receiveSummation));
+		link.sendData(sumTotal.marshall());
 	}
 
 

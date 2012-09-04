@@ -127,7 +127,9 @@ public class PeerList {
 		return listOfPeers.get(peerIndex);
 	}
 
-
+	public int size(){
+		return listOfPeers.size();
+	}
 	//================================================================================
 	// House Keeping
 	//================================================================================
