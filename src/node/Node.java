@@ -241,7 +241,8 @@ public class Node {
 		System.out.println("Difference Summation: " + (sendSummation - receiveSummation));
 
 		// Connect to the cumulation server to print totals
-		Peer collection = new Peer("bean", 5555);
+		
+		Peer collection = peerList.getFirstPeer();
 		Link link = connect(collection);
 		
 		TotalDifference total = new TotalDifference((sendTracker - receiveTracker));

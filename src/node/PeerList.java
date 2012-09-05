@@ -127,6 +127,15 @@ public class PeerList {
 		return listOfPeers.get(peerIndex);
 	}
 
+	
+	// Get first peer
+	public Peer getFirstPeer(){
+		if (listOfPeers.size() == 0){
+			return null;
+		}
+		
+		return listOfPeers.get(0);
+	}
 	public int size(){
 		return listOfPeers.size();
 	}
