@@ -1,12 +1,11 @@
-package communications;
+package cs555.messages.communications;
 
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-import utilities.Tools;
-
-import node.Node;
+import cs555.messages.utilities.*;
+import cs555.messages.node.*;
 
 // Server Sock Thread listens for remote connections
 public class ServerSockThread extends Thread{

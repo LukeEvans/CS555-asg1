@@ -1,4 +1,4 @@
-package node;
+package cs555.messages.node;
 
 // Class to abstract the peer
 public class Peer {

@@ -1,16 +1,13 @@
-package node;
+package cs555.messages.node;
 
 import java.io.IOException;
 import java.net.Socket;
 import java.util.Vector;
 
-import utilities.Tools;
-import wireformats.Constants;
-import wireformats.NodeResults;
-import wireformats.Payload;
-import wireformats.Verification;
-import communications.Link;
-import communications.ServerSockThread;
+
+import cs555.messages.communications.*;
+import cs555.messages.utilities.*;
+import cs555.messages.wireformats.*;
 
 // Main process in the system
 public class Node {

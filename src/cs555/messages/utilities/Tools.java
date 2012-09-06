@@ -1,4 +1,4 @@
-package utilities;
+package cs555.messages.utilities;
 
 import java.io.IOException;
 import java.io.InputStream;

@@ -1,4 +1,4 @@
-package wireformats;
+package cs555.messages.wireformats;
 
 public class Verification extends Payload{
 

@@ -1,4 +1,4 @@
-package node;
+package cs555.messages.node;
 
 import java.io.BufferedReader;
 import java.io.DataInputStream;
@@ -6,7 +6,7 @@ import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
-import utilities.*;
+import cs555.messages.utilities.*;
 
 // Peer list is a data structure to maintain the list of peers in the system
 public class PeerList {

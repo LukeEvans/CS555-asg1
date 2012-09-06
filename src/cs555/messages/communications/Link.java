@@ -1,16 +1,13 @@
-package communications;
+package cs555.messages.communications;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 
-import utilities.Tools;
-import wireformats.Constants;
-import wireformats.Verification;
-
-
-import node.Node;
+import cs555.messages.utilities.*;
+import cs555.messages.wireformats.*;
+import cs555.messages.node.*;
 
 // Link is a class to abstract a connection between nodes
 public class Link {

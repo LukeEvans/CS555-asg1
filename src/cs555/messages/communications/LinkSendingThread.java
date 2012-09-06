@@ -1,10 +1,10 @@
-package communications;
+package cs555.messages.communications;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
 
-import utilities.Tools;
+import cs555.messages.utilities.*;
 
 // Thread to send data
 public class LinkSendingThread extends Thread{

@@ -1,11 +1,11 @@
-package communications;
+package cs555.messages.communications;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.Socket;
 
-import utilities.Tools;
-import wireformats.Constants;
+import cs555.messages.utilities.*;
+import cs555.messages.wireformats.*;
 
 // Link Receiver is a thread that listens for data
 public class LinkReceiverThread extends Thread{

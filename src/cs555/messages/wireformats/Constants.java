@@ -1,4 +1,4 @@
-package wireformats;
+package cs555.messages.wireformats;
 
 // Constants for message types
 public class Constants {

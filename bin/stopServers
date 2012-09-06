@@ -1,0 +1,15 @@
+#!/bin/bash
+
+cmd="killall java" 
+
+ssh asparagus $cmd &    
+ssh beet $cmd &
+ssh cantaloupe $cmd &   
+ssh cauliflower $cmd &
+ssh corn $cmd &
+ssh dillweed $cmd &   
+ssh horseradish $cmd & 
+ssh lettuce $cmd & 
+ssh parsnip $cmd & 
+
+`$cmd`
