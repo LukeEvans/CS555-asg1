@@ -42,7 +42,7 @@ public class Node {
 	int totalReceived;
 	int totalSumReceived;
 	int finishCount;
-	
+
 	//================================================================================
 	// Constructor Process
 	//================================================================================
@@ -62,7 +62,7 @@ public class Node {
 
 		sendLock = new Boolean(true);
 		recLock = new Boolean(true);
-		
+
 		totalSent = 0;
 		totalSumSent = 0;
 		totalReceived = 0;
@@ -85,7 +85,7 @@ public class Node {
 		Peer peer = peerList.getNextPeer();
 		if (peer == null) return;
 
-		
+
 		// Abstract the link from the peer
 		Link link = connect(peer);
 		if (link == null) return;
@@ -150,23 +150,34 @@ public class Node {
 
 	}
 
+	// Send our results to everyone in the system
+	public void broadcastResults(){
+		for (Peer p : peerList.getAllPeers()){
+
+			publishResults(p);
+		}
+	}
+
 	// Publish results to cumulation server
-	public void publishResults(){
-		// Connect to the cumulation server to print totals
-		Peer collection = new Peer("bean", 5656);
-		Link link = connect(collection);
-		
+	public void publishResults(Peer peer){
+		// publish Results to peer
+		Link link = connect(peer);
+
 		NodeResults results = new NodeResults(sendTracker, receiveTracker, sendSummation, receiveSummation);
 		link.sendData(results.marshall());
 		byte[] replyData = link.waitForData();
+
+		NodeResults reply = new NodeResults();
+		reply.unmarshall(replyData);
 		
-		if (Tools.getMessageType(replyData) != Constants.Node_Results){
+		if (!reply.equals(results)){
 			System.out.println("Results verification did not match.");
 			System.exit(1);
 		}
-		
+
 		// Close the link
 		link.close();
+
 	}
 
 	//================================================================================
@@ -193,33 +204,40 @@ public class Node {
 			l.sendData(ack.marshall());
 
 			break;
-			
+
 		case Constants.Node_Results:
 			NodeResults results = new NodeResults();
 			results.unmarshall(bytes);
-			
+
 			// Save all of the node's information
 			int numSent = results.numberSent;
 			int numRec = results.numberReceived;
 			int sumSent = results.sumSent;
 			int sumRec = results.sumReceived;
-			
+
 			finishCount++;
 			totalSent += numSent;
 			totalReceived += numRec;
 			totalSumSent += sumSent;
 			totalSumReceived += sumRec;
-			
+
 			NodeResults resultsAck = new NodeResults(numSent, numRec, sumSent, sumRec);
 			l.sendData(resultsAck.marshall());
-			
+
 			// If we've heard back from everybody, print
-			if (finishCount == peerList.size()+1){
+			if (finishCount == peerList.size()){
+				totalSent += sendTracker;
+				totalReceived += receiveTracker;
+				totalSumSent += sendSummation;
+				totalSumReceived += receiveSummation;
 				printCumulativeOutput();
+
+				// Cleanup
+				l.close();
 			}
-			
+
 			break;
-			
+
 		default:
 			System.out.println("Received unrecognized message: " + messageType);
 			break;
@@ -244,15 +262,20 @@ public class Node {
 		System.out.println("Number Received: " + receiveTracker);
 
 		System.out.println("Difference Number: " + (sendTracker - receiveTracker));
-		
+
 		System.out.println("\nSend sum: " + sendSummation);
 		System.out.println("Receive sum: " + receiveSummation);
-		
+
 		System.out.println("Difference Summation: " + (sendSummation - receiveSummation));
 	}
 
 	// Prints the results seen by all servers in the system
 	public void printCumulativeOutput(){
+
+		// Print our data
+		printOutput();
+
+		// Print all data
 		System.out.println("\n\nAll nodes finished:");
 		System.out.println("Total messages sent: " + totalSent);
 		System.out.println("Total messages received: " + totalReceived);
@@ -265,10 +288,10 @@ public class Node {
 	//================================================================================
 	// Close the server
 	public void cleanup(){
-		System.out.println("Clean");
 		server.cont = false;
+		System.exit(0);
 	}
-	
+
 	//================================================================================
 	//================================================================================
 	// Main
@@ -311,7 +334,7 @@ public class Node {
 		Tools.sleep(5);
 
 		System.out.println("Beginning " + numberOfRounds + " rounds...");
-		
+
 		// For each round begin round
 		for (int i=0; i<numberOfRounds; i++){
 			node.beginRound();
@@ -320,10 +343,11 @@ public class Node {
 		// Wait for stragglers
 		Tools.sleep(3);
 
-		// Display output at each node
-		node.printOutput();
-		
 		// Send results back to cumulation server
-		node.publishResults();
+		node.broadcastResults();
+
+		// Give threads time to exit
+		Tools.sleep(5);
+		node.cleanup();
 	}
 }

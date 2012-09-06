@@ -133,6 +133,12 @@ public class PeerList {
 		
 		return listOfPeers.get(0);
 	}
+	
+	// Get all peers
+	public ArrayList<Peer> getAllPeers(){
+		return listOfPeers;
+	}
+	
 	public int size(){
 		return listOfPeers.size();
 	}
