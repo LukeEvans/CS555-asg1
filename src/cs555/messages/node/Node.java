@@ -136,8 +136,6 @@ public class Node {
 		Payload payload = new Payload(number);
 		link.sendData(payload.marshall());
 
-		// Increment data
-		//trackSend(number);
 	}
 
 	// Thread safe increment send tracker and summation
@@ -190,9 +188,6 @@ public class Node {
 
 			Payload payload = new Payload();
 			payload.unmarshall(bytes);
-
-			//System.out.println("Received Payload");
-			//System.out.println(payload);
 
 			trackReceive(payload.number);
 

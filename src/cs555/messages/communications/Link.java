@@ -28,7 +28,6 @@ public class Link {
 	}
 
 	public void initLink(){
-		//System.out.println("Init link");
 		receiver.start();
 	}
 
@@ -37,8 +36,6 @@ public class Link {
 	// Send 
 	//================================================================================
 	public void sendData(byte[] dataToBeSent){
-		//		LinkSendingThread sender = new LinkSendingThread(socket, dataToBeSent);
-		//		sender.start();
 
 		OutputStream sout = Tools.createOutputStream(socket);
 
