@@ -103,12 +103,9 @@ public class PeerList {
 	// Remove self from list
 	public void removeSelf(){
 		Peer self = findPeer(localHost, locaPort);
-
-		System.out.println("LocalHost: "+ localHost);
-		System.out.println("LocalPort: "+ locaPort);
 		
 		if (self != null){
-			System.out.println("Removing self");
+			System.out.println("Removing self from peer list: ("+localHost+":"+locaPort+")");
 			removePeer(self);
 		}
 	}

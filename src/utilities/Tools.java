@@ -51,7 +51,7 @@ public class Tools {
 			sin = s.getInputStream();
 			return sin;
 		} catch (IOException e){
-			e.printStackTrace();
+			printStackTrace(e);
 			return null;
 		}
 	}
@@ -64,7 +64,7 @@ public class Tools {
 			sout = s.getOutputStream();
 			return sout;
 		} catch (IOException e){
-			e.printStackTrace();
+			printStackTrace(e);
 			return null;
 		}
 	}
@@ -86,8 +86,7 @@ public class Tools {
 				return host;
 
 			} catch (UnknownHostException e) {
-				e.printStackTrace();
-				System.exit(1);
+				printStackTrace(e);
 			}
 		}
 
@@ -98,8 +97,7 @@ public class Tools {
 		try {
 			Thread.sleep(time * 1000);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			printStackTrace(e);
 		}
 	}
 	//================================================================================
@@ -115,4 +113,12 @@ public class Tools {
 		return convertToBytes(Integer.toString(i));
 	}
 
+	//================================================================================
+	// Error Handling
+	//================================================================================
+	public static void printStackTrace(Exception e){
+		e.printStackTrace();
+		System.exit(1);
+
+	}
 }

@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import utilities.Tools;
+
 import node.Node;
 
 // Server Sock Thread listens for remote connections
@@ -28,12 +30,12 @@ public class ServerSockThread extends Thread{
 	// Run
 	//================================================================================
 	public void run(){
-		System.out.println("Starting server on port: " + port);
+		System.out.println("Starting server on: " + Tools.getLocalHostname() + ", " + port);
 		
 		try {
 			server = new ServerSocket(port);
 		} catch (IOException e){
-			e.printStackTrace();
+			Tools.printStackTrace(e);
 		}
 		
 		while (cont) {
@@ -45,7 +47,7 @@ public class ServerSockThread extends Thread{
 				//System.out.println("Accepted");
 				
 			} catch (IOException e){
-				e.printStackTrace();
+				Tools.printStackTrace(e);
 			}
 		}
 	}

@@ -7,7 +7,6 @@ import java.net.Socket;
 
 import utilities.Tools;
 import wireformats.Constants;
-import wireformats.Payload;
 import wireformats.Verification;
 
 
@@ -41,15 +40,15 @@ public class Link {
 	// Send 
 	//================================================================================
 	public void sendData(byte[] dataToBeSent){
-//		LinkSendingThread sender = new LinkSendingThread(socket, dataToBeSent);
-//		sender.start();
-		
+		//		LinkSendingThread sender = new LinkSendingThread(socket, dataToBeSent);
+		//		sender.start();
+
 		OutputStream sout = Tools.createOutputStream(socket);
-		
+
 		try {
 			sout.write(dataToBeSent);
 		} catch (IOException e){
-			e.printStackTrace();
+			Tools.printStackTrace(e);
 		}
 	}
 
@@ -61,53 +60,57 @@ public class Link {
 		node.receive(dataReceived,this);
 	}
 
+	// Waits for an int to come back
+	public int waitForIntReply(){
 
-	public int waitForData(){
-		InputStream sin = Tools.createInput(socket);
-		byte[] bytesnum = new byte[Constants.LEN_BYTES];
-		int numRead;
-		
-		try {
-			numRead = sin.read(bytesnum);
-			
-			if (numRead >= 0){
-				int messageType = Tools.getMessageType(bytesnum);
-				
-				switch (messageType) {
-				case Constants.Verification:
-					
-					Verification ack = new Verification();
-					ack.unmarshall(bytesnum);
-					
-					return ack.number;
+		byte[] data = waitForData();
+		int messageType = Tools.getMessageType(data);
 
-				case Constants.Payload:
-					System.out.println("Oh boy");
-					System.exit(1);
-					break;
-				default:
-					break;
-				}
-			}
-			
-			
-			
-		} catch (IOException e){
-			e.printStackTrace();
+		switch (messageType) {
+		case Constants.Verification:
+
+			Verification ack = new Verification();
+			ack.unmarshall(data);
+
+			return ack.number;
+
+		default:
+			break;
 		}
-		
-		return -1;
-	}
-	//================================================================================
-	// House Keeping
-	//================================================================================
-	public void close() {
-		receiver.cont = false;
 
-		try {
-			socket.close();
-		} catch (IOException e){
-			System.out.println("Could not close socket");
+	return -1;
+}
+
+
+public byte[] waitForData(){
+	InputStream sin = Tools.createInput(socket);
+	byte[] bytesnum = new byte[Constants.LEN_BYTES];
+	int numRead;
+
+	try {
+		numRead = sin.read(bytesnum);
+
+		if (numRead >= 0){
+			return bytesnum;
 		}
+
+	} catch (IOException e){
+		Tools.printStackTrace(e);
 	}
+
+	return null;
+}
+//================================================================================
+// House Keeping
+//================================================================================
+public void close() {
+	receiver.cont = false;
+
+	try {
+		socket.close();
+	} catch (IOException e){
+		System.out.println("Could not close socket");
+		Tools.printStackTrace(e);
+	}
+}
 }

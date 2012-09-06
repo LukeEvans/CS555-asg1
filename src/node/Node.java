@@ -6,9 +6,8 @@ import java.util.Vector;
 
 import utilities.Tools;
 import wireformats.Constants;
+import wireformats.NodeResults;
 import wireformats.Payload;
-import wireformats.SumDifference;
-import wireformats.TotalDifference;
 import wireformats.Verification;
 import communications.Link;
 import communications.ServerSockThread;
@@ -38,8 +37,10 @@ public class Node {
 	Boolean recLock;
 
 	// Used for the collection server
-	int countTotal;
-	int sumTotal;
+	int totalSent;
+	int totalSumSent;
+	int totalReceived;
+	int totalSumReceived;
 	int finishCount;
 	
 	//================================================================================
@@ -62,8 +63,10 @@ public class Node {
 		sendLock = new Boolean(true);
 		recLock = new Boolean(true);
 		
-		countTotal = 0;
-		sumTotal = 0;
+		totalSent = 0;
+		totalSumSent = 0;
+		totalReceived = 0;
+		totalSumReceived = 0;
 		finishCount = 0;
 	}
 
@@ -94,9 +97,7 @@ public class Node {
 			int randomNumber = Tools.generateRandomNumber();
 			sendPayload(link, randomNumber);
 
-			int reply = link.waitForData();
-
-			//System.out.println("Sent: " + randomNumber + " Received: " + reply);
+			int reply = link.waitForIntReply();
 
 			if (reply != randomNumber){
 				System.out.println("Verification did not match.");
@@ -122,7 +123,8 @@ public class Node {
 			sock = new Socket(p.hostname,p.port);
 			link = new Link(sock, this);
 		} catch (IOException e){
-			e.printStackTrace();
+			System.out.println("Could not connect to: " + p.hostname + ", " + p.port);
+			Tools.printStackTrace(e);
 		}
 
 		return link;
@@ -148,6 +150,24 @@ public class Node {
 
 	}
 
+	// Publish results to cumulation server
+	public void publishResults(){
+		// Connect to the cumulation server to print totals
+		Peer collection = new Peer("bean", 5656);
+		Link link = connect(collection);
+		
+		NodeResults results = new NodeResults(sendTracker, receiveTracker, sendSummation, receiveSummation);
+		link.sendData(results.marshall());
+		byte[] replyData = link.waitForData();
+		
+		if (Tools.getMessageType(replyData) != Constants.Node_Results){
+			System.out.println("Results verification did not match.");
+			System.exit(1);
+		}
+		
+		// Close the link
+		link.close();
+	}
 
 	//================================================================================
 	// Receive
@@ -173,45 +193,35 @@ public class Node {
 			l.sendData(ack.marshall());
 
 			break;
-
-		case Constants.Verification:
-
-			Verification verification = new Verification();
-			verification.unmarshall(bytes);
-
-			System.out.println("Received verification");
-			System.exit(1);
-
-			break;
-
-		case Constants.Total_Difference:
-			TotalDifference total = new TotalDifference();
-			total.unmarshall(bytes);
 			
-			//System.out.println(l.remoteHost + ", " + total.number);
+		case Constants.Node_Results:
+			NodeResults results = new NodeResults();
+			results.unmarshall(bytes);
 			
-			countTotal += total.number;
+			// Save all of the node's information
+			int numSent = results.numberSent;
+			int numRec = results.numberReceived;
+			int sumSent = results.sumSent;
+			int sumRec = results.sumReceived;
 			
-			break;
-			
-		case Constants.Sum_Difference:
-			SumDifference sum = new SumDifference();
-			sum.unmarshall(bytes);
-			
-			sumTotal += sum.number;
 			finishCount++;
+			totalSent += numSent;
+			totalReceived += numRec;
+			totalSumSent += sumSent;
+			totalSumReceived += sumRec;
+			
+			NodeResults resultsAck = new NodeResults(numSent, numRec, sumSent, sumRec);
+			l.sendData(resultsAck.marshall());
 			
 			// If we've heard back from everybody, print
-			if (finishCount == peerList.size()){
-				System.out.println("\n\nFinished:");
-				System.out.println("Total Difference: " + countTotal);
-				System.out.println("Sum Difference:   " + sumTotal);
+			if (finishCount == peerList.size()+1){
+				printCumulativeOutput();
 			}
+			
 			break;
 			
 		default:
-
-			System.out.println("Received unrecognized message");
+			System.out.println("Received unrecognized message: " + messageType);
 			break;
 		}
 	}
@@ -239,21 +249,26 @@ public class Node {
 		System.out.println("Receive sum: " + receiveSummation);
 		
 		System.out.println("Difference Summation: " + (sendSummation - receiveSummation));
-
-		// Connect to the cumulation server to print totals
-		
-		Peer collection = peerList.getFirstPeer();
-		Link link = connect(collection);
-		
-		TotalDifference total = new TotalDifference((sendTracker - receiveTracker));
-		link.sendData(total.marshall());
-		
-		SumDifference sumTotal = new SumDifference((sendSummation - receiveSummation));
-		link.sendData(sumTotal.marshall());
 	}
 
+	// Prints the results seen by all servers in the system
+	public void printCumulativeOutput(){
+		System.out.println("\n\nAll nodes finished:");
+		System.out.println("Total messages sent: " + totalSent);
+		System.out.println("Total messages received: " + totalReceived);
+		System.out.println("Total sum sent: " + totalSumSent);
+		System.out.println("Total sum received:   " + totalSumReceived +"\n");	
+	}
 
-
+	//================================================================================
+	// Cleanup
+	//================================================================================
+	// Close the server
+	public void cleanup(){
+		System.out.println("Clean");
+		server.cont = false;
+	}
+	
 	//================================================================================
 	//================================================================================
 	// Main
@@ -293,7 +308,7 @@ public class Node {
 		System.out.println("Waiting for other nodes to join the system...");
 
 		// Sleep to give time for others to join
-		Tools.sleep(10);
+		Tools.sleep(5);
 
 		System.out.println("Beginning " + numberOfRounds + " rounds...");
 		
@@ -305,6 +320,10 @@ public class Node {
 		// Wait for stragglers
 		Tools.sleep(3);
 
+		// Display output at each node
 		node.printOutput();
+		
+		// Send results back to cumulation server
+		node.publishResults();
 	}
 }

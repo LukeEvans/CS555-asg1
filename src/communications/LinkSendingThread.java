@@ -29,7 +29,7 @@ public class LinkSendingThread extends Thread{
 		try {
 			sout.write(data);
 		} catch (IOException e){
-			e.printStackTrace();
+			Tools.printStackTrace(e);
 		}
 	}
 }
