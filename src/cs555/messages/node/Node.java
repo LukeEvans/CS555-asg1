@@ -384,6 +384,11 @@ public class Node {
 		// For each round begin round
 		for (int i=0; i<numberOfRounds; i++){
 			node.beginRound();
+			 
+			// Print progress report for user
+			if (i % 100 == 0){
+				System.out.println("Completed: " + i + "/" + numberOfRounds);
+			}
 		}
 
 		node.thisNodeFinished = true;
