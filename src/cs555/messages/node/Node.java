@@ -335,7 +335,7 @@ public class Node {
 		// Wait for stragglers
 		Tools.sleep(3);
 
-		// Send results back to cumulation server
+		// Send results to all nodes
 		node.broadcastResults();
 
 		// Give threads time to exit
