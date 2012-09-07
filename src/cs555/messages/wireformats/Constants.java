@@ -7,6 +7,7 @@ public class Constants {
 	public static final int Payload = 1;
 	public static final int Verification = 2;
 	public static final int Node_Results = 3;
+	public static final int Node_Complete = 4;
 	
 	public static final int Failure = 99;
 	

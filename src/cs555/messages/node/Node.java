@@ -39,6 +39,12 @@ public class Node {
 	int totalReceived;
 	int totalSumReceived;
 	int finishCount;
+	int resultsCount;
+
+	// Finish flags
+	Object finishedLock = new Object();
+	boolean thisNodeFinished;
+	boolean allNodesFinished;
 
 	//================================================================================
 	// Constructor Process
@@ -65,6 +71,10 @@ public class Node {
 		totalReceived = 0;
 		totalSumReceived = 0;
 		finishCount = 0;
+		resultsCount = 0;
+
+		thisNodeFinished = false;
+		allNodesFinished = false;
 	}
 
 	public void initServer(){
@@ -145,10 +155,38 @@ public class Node {
 
 	}
 
+	// Broadcast the fact that this node has completed sending
+	public void broadcastComplete(){
+		for (Peer p : peerList.getAllPeers()){
+			publishCompleteMessage(p);
+		}
+	}
+
+	// Publish all our complete messages
+	public void publishCompleteMessage(Peer peer){
+		// publish Results to peer
+		Link link = connect(peer);
+
+		NodeComplete message = new NodeComplete(Constants.Node_Complete);
+		link.sendData(message.marshall());
+		byte[] replyData = link.waitForData();
+
+		Verification reply = new Verification();
+		reply.unmarshall(replyData);
+
+		if (!reply.equals(message)){
+			System.out.println("Results verification did not match.");
+			System.exit(1);
+		}
+
+		// Close the link
+		link.close();
+
+	}
+
 	// Send our results to everyone in the system
 	public void broadcastResults(){
 		for (Peer p : peerList.getAllPeers()){
-
 			publishResults(p);
 		}
 	}
@@ -164,7 +202,7 @@ public class Node {
 
 		NodeResults reply = new NodeResults();
 		reply.unmarshall(replyData);
-		
+
 		if (!reply.equals(results)){
 			System.out.println("Results verification did not match.");
 			System.exit(1);
@@ -207,7 +245,7 @@ public class Node {
 			int sumSent = results.sumSent;
 			int sumRec = results.sumReceived;
 
-			finishCount++;
+			resultsCount++;
 			totalSent += numSent;
 			totalReceived += numRec;
 			totalSumSent += sumSent;
@@ -217,19 +255,38 @@ public class Node {
 			l.sendData(resultsAck.marshall());
 
 			// If we've heard back from everybody, print
-			if (finishCount == peerList.size()){
+			if (resultsCount == peerList.size()){
 				totalSent += sendTracker;
 				totalReceived += receiveTracker;
 				totalSumSent += sendSummation;
 				totalSumReceived += receiveSummation;
 				printCumulativeOutput();
 
-				// Cleanup
-				l.close();
 			}
+
+			l.close();
 
 			break;
 
+		case Constants.Node_Complete:
+
+			NodeComplete completeMessage = new NodeComplete();
+			completeMessage.unmarshall(bytes);
+
+			Verification reply = new Verification(completeMessage.number);
+			l.sendData(reply.marshall());
+
+			finishCount++;
+
+			if (finishCount == peerList.size()){
+				synchronized (finishedLock) {
+					allNodesFinished = true;
+				}
+			}
+
+			l.close();
+
+			break;
 		default:
 			System.out.println("Received unrecognized message: " + messageType);
 			break;
@@ -263,9 +320,6 @@ public class Node {
 
 	// Prints the results seen by all servers in the system
 	public void printCumulativeOutput(){
-
-		// Print our data
-		printOutput();
 
 		// Print all data
 		System.out.println("\n\nAll nodes finished:");
@@ -332,14 +386,23 @@ public class Node {
 			node.beginRound();
 		}
 
+		node.thisNodeFinished = true;
+		node.broadcastComplete();
+
 		// Wait for stragglers
-		Tools.sleep(3);
+		while (true){
+			synchronized (node.finishedLock) {
+				if (node.thisNodeFinished && node.allNodesFinished){
+					break;
+				}
+			}
+		}
+
+		// Print output
+		node.printOutput();
 
 		// Send results to all nodes
 		node.broadcastResults();
 
-		// Give threads time to exit
-		Tools.sleep(5);
-		node.cleanup();
 	}
 }
