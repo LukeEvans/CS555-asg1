@@ -1,14 +1,14 @@
 Warmup for CS555
 
-In this assignment you will be creating a set of processes P that are launched on different machines. 
-At each process, you will read information about this set of processes from a text file: each line in the 
+Messages creates a set of processes P that are launched on different machines. 
+At each process, it will read information about this set of processes from a text file: each line in the 
 file will contain the host and port information for the process comprising this set. A process should 
 never attempt to connect to itself; so it should not appear its list of available processes. It follows that 
 the config file at each process will be different. 
 
 Each process participates in a set of rounds. Each round involves a process connecting to a randomly 
 chosen process in the set of processes  P. All communications in the system will be based on TCP. 
-Once a connection is established to a random node, the initiating process sends 5 messages to the
+Once a connection is established to a random node, the initiating process sends a specified number of messages to the
 targeted process. The payload of each message is a random integer (positive or negative). At the end 
 of each round the socket connection is closed and the process is repeated by choosing another node at 
 random from the set P. Each process will initiate 5000 such rounds
