@@ -377,7 +377,7 @@ public class Node {
 		System.out.println("Waiting for other nodes to join the system...");
 
 		// Sleep to give time for others to join
-		Tools.sleep(5);
+		Tools.sleep(20);
 
 		System.out.println("Beginning " + numberOfRounds + " rounds...");
 
