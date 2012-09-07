@@ -11,7 +11,7 @@ chosen process in the set of processes  P. All communications in the system will
 Once a connection is established to a random node, the initiating process sends a specified number of messages to the
 targeted process. The payload of each message is a random integer (positive or negative). At the end 
 of each round the socket connection is closed and the process is repeated by choosing another node at 
-random from the set P. Each process will initiate 5000 such rounds
+random from the set P. Each process will initiate a specified number of such rounds
 
 
 COMMUNICATIONS: 
