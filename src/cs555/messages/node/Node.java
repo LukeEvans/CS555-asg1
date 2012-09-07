@@ -386,7 +386,7 @@ public class Node {
 			node.beginRound();
 			 
 			// Print progress report for user
-			if (i % 100 == 0){
+			if (i % 1000 == 0){
 				System.out.println("Completed: " + i + "/" + numberOfRounds);
 			}
 		}
